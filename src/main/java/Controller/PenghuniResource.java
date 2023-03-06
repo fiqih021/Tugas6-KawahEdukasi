@@ -3,64 +3,49 @@ package Controller;
 import java.util.List;
 import java.util.UUID;
 
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import Model.Penghuni;
+import Service.PenghuniService;
 
 /**
  * FruitResource
  */
+
 @Path("/penghuni")
 public class PenghuniResource {
 
+    @Inject
+    PenghuniService penghuniService;
+
     @GET
     public List<Penghuni> listPenghuni() {
-        List<Penghuni> listPenghuni = Penghuni.listAll();
-        return listPenghuni;
+        return penghuniService.getPenghuni();
     }
 
     @GET
     @Path("/{id}")
     public Penghuni get(UUID id) {
-        return Penghuni.findById(id);
+        return penghuniService.getPenghuniByUUID(id);
     }
 
     @POST
-    @Transactional
     public List<Penghuni> create(Penghuni penghuni) {
-        penghuni.id = UUID.randomUUID();
-        penghuni.persist();
-        return Penghuni.listAll();
+        return penghuniService.createPenghuni(penghuni);
     }
 
     @PUT
     @Path("/{id}")
-    @Transactional
     public Penghuni update(UUID id, Penghuni penghuni) {
-        Penghuni entity = Penghuni.findById(id);
-        if (entity == null) {
-            throw new NotFoundException();
-        }
-
-        // map all fields from the Penghuni parameter to the existing entity
-        entity.asal = penghuni.asal;
-        entity.jenisKelamin = penghuni.jenisKelamin;
-        entity.nama = penghuni.nama;
-        entity.nik = penghuni.nik;
-        entity.noHp = penghuni.noHp;
-
-        return entity;
+        return penghuniService.updatePenghuni(id, penghuni);
     }
 
     @DELETE
     @Path("/{id}")
-    @Transactional
-    public void delete(UUID id) {
-        Penghuni entity = Penghuni.findById(id);
-        if (entity == null) {
-            throw new NotFoundException();
-        }
-        entity.delete();
+    public List<Penghuni> delete(UUID id) {
+        return penghuniService.deletePenghuni(id);
+
     }
 
 }
